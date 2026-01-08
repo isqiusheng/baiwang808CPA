@@ -2,16 +2,15 @@
   "log": { "loglevel": "warning" },
   "inbounds": [
     {
-      "tag": "socks-in",
       "listen": "127.0.0.1",
-      "port": 7897,
+      "port": 1080,
       "protocol": "socks",
-      "settings": { "udp": true }
+      "settings": { "auth": "noauth", "udp": true }
     }
   ],
   "outbounds": [
     {
-      "tag": "proxy-out",
+      "tag": "vmess-out",
       "protocol": "vmess",
       "settings": {
         "vnext": [
@@ -19,23 +18,20 @@
             "address": "${VMESS_HOST}",
             "port": ${VMESS_PORT},
             "users": [
-              { "id": "${VMESS_UUID}", "alterId": 0, "security": "auto" }
+              { "id": "${VMESS_UUID}", "alterId": ${VMESS_ALTERID}, "security": "${VMESS_SECURITY}" }
             ]
           }
         ]
       },
       "streamSettings": {
-        "network": "${VMESS_NETWORK}",
-        "security": "${VMESS_SECURITY}",
-        "wsSettings": { "path": "${VMESS_WS_PATH}" }
+        "network": "tcp",
+        "security": "none"
       }
-    },
-    { "tag": "direct", "protocol": "freedom" },
-    { "tag": "block", "protocol": "blackhole" }
+    }
   ],
   "routing": {
     "rules": [
-      { "type": "field", "inboundTag": ["socks-in"], "outboundTag": "proxy-out" }
+      { "type": "field", "outboundTag": "vmess-out" }
     ]
   }
 }
