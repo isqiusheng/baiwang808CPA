@@ -1,0 +1,41 @@
+{
+  "log": { "loglevel": "warning" },
+  "inbounds": [
+    {
+      "tag": "socks-in",
+      "listen": "127.0.0.1",
+      "port": 7897,
+      "protocol": "socks",
+      "settings": { "udp": true }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "proxy-out",
+      "protocol": "vmess",
+      "settings": {
+        "vnext": [
+          {
+            "address": "${VMESS_HOST}",
+            "port": ${VMESS_PORT},
+            "users": [
+              { "id": "${VMESS_UUID}", "alterId": 0, "security": "auto" }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "${VMESS_NETWORK}",
+        "security": "${VMESS_SECURITY}",
+        "wsSettings": { "path": "${VMESS_WS_PATH}" }
+      }
+    },
+    { "tag": "direct", "protocol": "freedom" },
+    { "tag": "block", "protocol": "blackhole" }
+  ],
+  "routing": {
+    "rules": [
+      { "type": "field", "inboundTag": ["socks-in"], "outboundTag": "proxy-out" }
+    ]
+  }
+}
